@@ -47,7 +47,11 @@ classdef PhysEng
                       PhysEng.getAngleBetween(m1,m2)];
         end
         
-        % Method to calc vect_ve of given vect_Fg
+        % Method to calc vect_ve of given vect_Fg exerted on an obj over
+        % time
+        function vect_ve = getVelocity(vect_Fg, obj, t)
+           vect_ve = [vect_Fg(1)/obj.mass*t, vect_Fg(2)];
+        end
         
     end
 end
