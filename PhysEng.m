@@ -20,7 +20,62 @@ classdef PhysEng
             cb_new.pos = PhysEng.calcNewPosition(cb, newVel, universe.timestep);
             cb_new.vel = newVel;
         end
+          
+    end
+    
+    methods(Access = private, Static)
+        % Method to calc distance between two obj
+        function dist = getDistanceBetween(obj1, obj2)
+            dist = sqrt((obj2.pos(1)-obj1.pos(1))^2 + (obj2.pos(2)-obj1.pos(2))^2);
+        end
         
+        % Method to calc angle between two obj (oriented right.rads)
+        function rad = getAngleBetween(obj1, obj2)
+            delta_y = obj2.pos(2) - obj1.pos(2);
+            delta_x = obj2.pos(1) - obj1.pos(1);
+            rad     = atan(delta_y / delta_x);
+
+            if(delta_x > 0 && delta_y < 0)
+                rad = rad + 2*pi;
+            elseif(delta_x < 0 || delta_y < 0)
+                rad = rad + pi;
+            end
+        end
+        
+        % Method to convert polar to rectangular notation
+        function recVec = pol2rec(polVec)
+            recVec = [polVec(1)*cos(polVec(2)), polVec(1)*sin(polVec(2))];
+        end
+        
+        % Method to convert rectangular to polar notation
+        function polVec = rec2pol(recVec)
+            mag = sqrt(recVec(1)^2 + recVec(2)^2);
+            dir = atan(recVec(2)/recVec(1));
+            if(recVec(1)>0 && recVec(2)<0)
+                dir = dir+2*pi;
+            elseif(recVec(1)<0 || recVec(2)<0)
+                dir = dir+pi;
+            end
+            polVec = [mag,dir];
+        end
+        
+        % Method to add two polar vectors as polar vector
+        function polVec_sum = addPolVec(polVec1, polVec2)
+            polVec_sum = PhysEng.rec2pol(PhysEng.pol2rec(polVec1) + PhysEng.pol2rec(polVec2));
+        end
+        
+        % Method to calc vect_fg between two distanced obj (kg.m)
+        function vect_Fg = getForceGravity(obj1, obj2)
+           vect_Fg = [PhysEng.GravitationalConstant*obj2.mass*obj1.mass/ ...
+                      PhysEng.getDistanceBetween(obj1,obj2)^2,           ...
+                      PhysEng.getAngleBetween(obj1,obj2)];
+        end
+        
+        % Method to calc vect_ve of given vect_Fg exerted on an obj over
+        % timestep
+        function vect_ve = getVelocity(vect_Fg, obj, timestep)
+            vect_ve = [vect_Fg(1)/obj.mass*timestep, vect_Fg(2)];
+        end
         
         % Given a celestial body, calculate a new (COPY!!!) velocity given
         % gravitational forces from other bodies in universe over given
@@ -45,61 +100,7 @@ classdef PhysEng
             cb_newPos = [cb.pos(1)+deltaPos_X,cb.pos(2)+deltaPos_Y];
         end
         
-    end
-    
-    methods(Access = private, Static)
-        % Method to calc distance between two obj
-        function dist = getDistanceBetween(obj1, obj2)
-            dist = sqrt((obj2.pos(1)-obj1.pos(1))^2 + (obj2.pos(2)-obj1.pos(2))^2);
-        end
         
-        % Method to calc angle between two obj (oriented right.rads)
-        function rad = getAngleBetween(obj1, obj2)
-            delta_y = obj2.pos(2) - obj1.pos(2);
-            delta_x = obj2.pos(1) - obj1.pos(1);
-            rad     = atan(delta_y / delta_x);
-
-            if(delta_x > 0 && delta_y < 0)
-                rad = rad + 2*pi;
-            elseif(delta_x < 0 || delta_y < 0)
-                rad = rad + pi;
-            end
-        end
-        
-        % Method to calc vect_fg between two distanced obj (kg.m)
-        function vect_Fg = getForceGravity(obj1, obj2)
-           vect_Fg = [PhysEng.GravitationalConstant*obj2.mass*obj1.mass/ ...
-                      PhysEng.getDistanceBetween(obj1,obj2)^2,           ...
-                      PhysEng.getAngleBetween(obj1,obj2)];
-        end
-        
-        % Method to calc vect_ve of given vect_Fg exerted on an obj over
-        % timestep
-        function vect_ve = getVelocity(vect_Fg, obj, timestep)
-            vect_ve = [vect_Fg(1)/obj.mass*timestep, vect_Fg(2)];
-        end
-        
-        % Method to convert polar to rectangular notation
-        function recVec = pol2rec(polVec)
-            recVec = [polVec(1)*cos(polVec(2)), polVec(1)*sin(polVec(2))];
-        end
-        
-        % Method to convert rectangular to polar notation
-        function polVec = rec2pol(recVec)
-            mag = sqrt(recVec(1)^2 + recVec(2)^2);
-            dir = atan(recVec(2)/recVec(1));
-            if(recVec(1)>0 && recVec(2)<0)
-                dir = dir+2*pi;
-            elseif(recVec(1)<0 || recVec(2)<0)
-                dir = dir+pi;
-            end
-            polVec = [mag,dir];
-        end
-        
-        % Method to add two polar vectors as polar vector
-        function polVec_sum = addPolVec(polVec1, polVec2)
-            polVec_sum = PhysEng.rec2pol(PhysEng.pol2rec(polVec1) + PhysEng.pol2rec(polVec2));
-        end
         
     end
 end
