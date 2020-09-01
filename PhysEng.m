@@ -14,11 +14,11 @@ classdef PhysEng
     methods(Static)
         % Method to update velocity and position of celestial body in given
         % universe
-        % DEBUG: velocity -> position
+        % DEBUG: cb_new should be COPY of cb
         function cb_new = updateCelestialBody(cb, universe)
             cb_new = cb;
             newVel = PhysEng.calcNewVelocity(cb, universe.bodies, universe.time);
-            %cb_new.pos = PhysEng.calcNewPosition(cb, newVel, universe.time);
+            cb_new.pos = PhysEng.calcNewPosition(cb, newVel, universe.time);
             cb_new.vel = newVel;
             
             
@@ -28,10 +28,13 @@ classdef PhysEng
         % Given a celestial body, calculate a new (COPY!!!) velocity given
         % gravitational forces from other bodies in universe over given
         % time
+        % DEBUG: cb_newVel should be COPY of cb.vel
         function cb_newVel = calcNewVelocity(cb, bodies, t)
-            cb_newVel = cb.vel; % copied temp velocity to hold cb's modified vel
+            cb_newVel = eval(cb.vel); % copied temp velocity to hold cb's modified vel
+            isequal(cb_newVel,cb.vel);
             for body = bodies
                 if(~isequal(cb, body))
+                    
                     vect_Fg   = PhysEng.getForceGravity(cb, body);
                     vect_ve   = PhysEng.getVelocity(vect_Fg, cb, t);
                     cb_newVel = PhysEng.addPolVec(cb_newVel,vect_ve);
