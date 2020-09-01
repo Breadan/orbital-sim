@@ -2,7 +2,7 @@ classdef CelestialBody
     properties
         isStatic = false;   % default false
         pos;                % vector coordinate
-        vel;                % velocity vector
+        vel;                % velocity polar vector
         radius;             % body radius
         mass;               % body mass
     end
