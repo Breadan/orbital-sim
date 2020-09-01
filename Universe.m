@@ -2,14 +2,14 @@ classdef Universe
 
     properties
         bodies;
-        time;
+        timestep;
     end
 
     methods
         %Constructor
-        function obj = Universe(bodies, time)
-            obj.bodies = bodies;
-            obj.time = time;
+        function obj = Universe(bodies, timestep)
+            obj.bodies   = bodies;
+            obj.timestep = timestep;
         end
         
     end

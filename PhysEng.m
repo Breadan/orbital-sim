@@ -14,29 +14,23 @@ classdef PhysEng
     methods(Static)
         % Method to update velocity and position of celestial body in given
         % universe
-        % DEBUG: cb_new should be COPY of cb
         function cb_new = updateCelestialBody(cb, universe)
             cb_new = cb;
-            newVel = PhysEng.calcNewVelocity(cb, universe.bodies, universe.time);
-            cb_new.pos = PhysEng.calcNewPosition(cb, newVel, universe.time);
+            newVel = PhysEng.calcNewVelocity(cb, universe.bodies, universe.timestep);
+            cb_new.pos = PhysEng.calcNewPosition(cb, newVel, universe.timestep);
             cb_new.vel = newVel;
-            
-            
         end
         
         
         % Given a celestial body, calculate a new (COPY!!!) velocity given
         % gravitational forces from other bodies in universe over given
-        % time
-        % DEBUG: cb_newVel should be COPY of cb.vel
-        function cb_newVel = calcNewVelocity(cb, bodies, t)
-            cb_newVel = eval(cb.vel); % copied temp velocity to hold cb's modified vel
-            isequal(cb_newVel,cb.vel);
+        % timestep
+        function cb_newVel = calcNewVelocity(cb, bodies, timestep)
+            cb_newVel = cb.vel;
             for body = bodies
                 if(~isequal(cb, body))
-                    
                     vect_Fg   = PhysEng.getForceGravity(cb, body);
-                    vect_ve   = PhysEng.getVelocity(vect_Fg, cb, t);
+                    vect_ve   = PhysEng.getVelocity(vect_Fg, cb, timestep);
                     cb_newVel = PhysEng.addPolVec(cb_newVel,vect_ve);
                 end
             end
@@ -44,15 +38,11 @@ classdef PhysEng
         
         % Calculate change in position of given celestial body based on
         % new velocity vector
-        function cb_newPos = calcNewPosition(cb, cb_newVel, t)
-           deltaPos  = ((cb.vel(1)+cb_newVel(1))/2)*t; % REVIEW needs Dx and Dy
-           deltaPos_X = deltaPos*cos(cb_newVel(2));
-           deltaPos_Y = deltaPos*sin(cb_newVel(2));
-           cb_newPos = [cb.pos(1)+deltaPos_X,cb.pos(2)+deltaPos_Y];
-        end
-        
-        function result = testPhys(cb, bodies, t)
-            result = PhysEng.calcNewVelocity(cb, bodies, t);
+        function cb_newPos = calcNewPosition(cb, cb_newVel, timestep)
+            deltaPos  = ((cb.vel(1)+cb_newVel(1))/2)*timestep;
+            deltaPos_X = deltaPos*cos(cb_newVel(2));
+            deltaPos_Y = deltaPos*sin(cb_newVel(2));
+            cb_newPos = [cb.pos(1)+deltaPos_X,cb.pos(2)+deltaPos_Y];
         end
         
     end
@@ -84,9 +74,9 @@ classdef PhysEng
         end
         
         % Method to calc vect_ve of given vect_Fg exerted on an obj over
-        % time
-        function vect_ve = getVelocity(vect_Fg, obj, t)
-            vect_ve = [vect_Fg(1)/obj.mass*t, vect_Fg(2)];
+        % timestep
+        function vect_ve = getVelocity(vect_Fg, obj, timestep)
+            vect_ve = [vect_Fg(1)/obj.mass*timestep, vect_Fg(2)];
         end
         
         % Method to convert polar to rectangular notation
