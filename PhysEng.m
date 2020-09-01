@@ -14,7 +14,7 @@ classdef PhysEng
     methods(Static)
         % Method to update velocity and position of celestial body in given
         % universe
-        % DEBUG: velocity
+        % DEBUG: velocity -> position
         function cb_new = updateCelestialBody(cb, universe)
             cb_new = cb;
             newVel = PhysEng.calcNewVelocity(cb, universe.bodies, universe.time);
