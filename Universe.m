@@ -3,13 +3,15 @@ classdef Universe
     properties
         bodies;
         timestep;
+        x_limit;
+        y_limit;
     end
     
     % Solar System Preset 
     properties(Constant)
         % scaling properties
-        x_limit = [-4.5E12,4.5E12];
-        y_limit = [-4.5E12,4.5E12];
+        x_limitSol = [-4.5E12,4.5E12];
+        y_limitSol = [-4.5E12,4.5E12];
         planetScale = 1;
         
         % sun
@@ -86,9 +88,11 @@ classdef Universe
 
     methods(Access = public)
         %Constructor
-        function obj = Universe(bodies, timestep)
+        function obj = Universe(bodies, timestep, x_limit, y_limit)
             obj.bodies   = bodies;
             obj.timestep = timestep;
+            obj.x_limit = x_limit;
+            obj.y_limit = y_limit;
         end
          
         %Big bang
@@ -104,12 +108,13 @@ classdef Universe
                 for i = 1:length(obj.bodies)
                     obj.bodies(i) = PhysEng.updateCelestialBody(obj.bodies(i), obj);
                 end
+                disp(obj.bodies(2));
                 
                 % prepare frame below
                 clf();
                 hold on;
-                xlim(Universe.x_limit);
-                ylim(Universe.y_limit);
+                xlim(obj.x_limit);
+                ylim(obj.y_limit);
                 % draw points below
                 for i = 1:length(obj.bodies)
                     scatter(obj.bodies(i).pos(1), obj.bodies(i).pos(2), 2*obj.bodies(i).dradius, obj.bodies(i).col, 'filled');
@@ -126,6 +131,9 @@ classdef Universe
     methods(Static)
         % Preset: Solar System
         function bodies = setSolarSystem()
+            % scaling
+            Universe.x_limit = Universe.x_limitSol;
+            Universe.y_limit = Universe.y_limitSol;
             % sun
             sun = CelestialBody("The Sun",        ...
                                 Universe.sunCol,  ...
