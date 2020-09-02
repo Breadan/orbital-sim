@@ -3,7 +3,7 @@ classdef PhysEng
     % Takes in various inputs from Universe and modifies CelestialBodies in
     % said space
     %
-    % - keep mode in radians
+    % - keep units in m, kg, rads
     % - keep vect in polar
     % ! NOTE: probably not using time, t, in correct sense...
     
@@ -15,10 +15,14 @@ classdef PhysEng
         % Method to update velocity and position of celestial body in given
         % universe
         function cb_new = updateCelestialBody(cb, universe)
-            cb_new = cb;
-            newVel = PhysEng.calcNewVelocity(cb, universe.bodies, universe.timestep);
-            cb_new.pos = PhysEng.calcNewPosition(cb, newVel, universe.timestep);
-            cb_new.vel = newVel;
+            if(~cb.isStatic)
+                cb_new = cb;
+                newVel = PhysEng.calcNewVelocity(cb, universe.bodies, universe.timestep);
+                cb_new.pos = PhysEng.calcNewPosition(cb, newVel, universe.timestep);
+                cb_new.vel = newVel;
+            else
+                cb_new = cb;
+            end
         end
           
     end
