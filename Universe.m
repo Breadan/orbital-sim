@@ -25,17 +25,12 @@ classdef Universe
         
          
         %Big bang
-        function bigBang(obj, frames, varargin)
+        function bigBang(obj, frames, trailType)
             % calculate prediction trail below
             % TODO: Currently only predicts as if all other bodies were
             % STATIC
-            if(nargin > 2)
-                pFrames = varargin{1}; % number of frames to calculate predictions
-                ptrails = Universe.calcPTrails(obj, pFrames);
-            end
-            
-            sim = figure();
-                                
+            pPos = Universe.calcPPos(obj, frames);
+            sim = figure();    
             disp("a big bang bangs...");
             for frame = 1:frames
                 if(~ishghandle(sim))
@@ -43,10 +38,7 @@ classdef Universe
                 end
                 
                 
-                % update physics
-                for i = 1:length(obj.bodies)
-                    obj.bodies(i) = PhysEng.updateCelestialBody(obj.bodies(i), obj);
-                end
+
                 
                 % prepare frame below
                 clf();
@@ -56,12 +48,12 @@ classdef Universe
                 xlim(obj.x_limit);
                 ylim(obj.y_limit);
                 % draw prediction trail below
-                if(nargin > 2)                    
-                    Universe.drawPTrails(obj, ptrails, pFrames);
+                if(trailType > 0)                    
+                    Universe.drawPPos(obj, pPos, frames, frame, trailType);
                 end
                 % draw points below
                 for i = 1:length(obj.bodies)
-                    scatter(obj.bodies(i).pos(1), obj.bodies(i).pos(2), 2*obj.bodies(i).dradius, obj.bodies(i).col, 'filled');
+                    scatter(pPos{i}{1}{frame}, pPos{i}{2}{frame}, 2*obj.bodies(i).dradius, obj.bodies(i).col, 'filled');
                 end
                 hold off;
                 drawnow();
@@ -73,19 +65,18 @@ classdef Universe
     
     methods(Access = private, Static)
         %Calculate predictive trails
-        function ptrails = calcPTrails(obj, pFrames)
+        function pPos = calcPPos(obj, pFrames)
             pUni = obj;
             planets = length(pUni.bodies);
-            ptrails = cell(1,planets);
+            pPos = cell(1,planets);
             for i = 1:planets
-                ptrails{i} = {cell(1,pFrames),cell(1,pFrames)};
+                pPos{i} = {cell(1,pFrames),cell(1,pFrames)};
             end         
-            % revising...
             for i = 1:pFrames
                 for j = 1:planets
                     planetPos      = PhysEng.updateCelestialBody(pUni.bodies(j), pUni).pos;
-                    ptrails{j}{1}{i}  = planetPos(1);
-                    ptrails{j}{2}{i}  = planetPos(2);
+                    pPos{j}{1}{i}  = planetPos(1);
+                    pPos{j}{2}{i}  = planetPos(2);
                     pUni.bodies(j) = PhysEng.updateCelestialBody(pUni.bodies(j), pUni);
                     pUni.bodies(j) = pUni.bodies(j);
                 end
@@ -94,14 +85,21 @@ classdef Universe
         end
         
         %Draw predictive trails
-        function drawPTrails(obj, ptrails, pFrames)
+        function drawPPos(obj, ptrails, pFrames, cFrames, trailType)
             plotX = zeros(length(pFrames));
             plotY = zeros(length(pFrames));
             for i = 1:length(obj.bodies) 
                 if(~obj.bodies(i).isStatic)
-                    for j = 1:pFrames
-                        plotX(j) = ptrails{i}{1}{j};
-                        plotY(j) = ptrails{i}{2}{j};
+                    if(trailType == 1)
+                        for j = 1:pFrames
+                            plotX(j) = ptrails{i}{1}{j};
+                            plotY(j) = ptrails{i}{2}{j};
+                        end
+                    elseif(trailType == 2)
+                        for j = 1:cFrames
+                            plotX(j) = ptrails{i}{1}{j};
+                            plotY(j) = ptrails{i}{2}{j};
+                        end
                     end
                     plot(plotX,plotY,'Color',obj.bodies(i).col,'LineWidth',1.5);
                 end
