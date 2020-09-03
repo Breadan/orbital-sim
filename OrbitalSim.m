@@ -15,15 +15,15 @@ clear;
 close all;
 format long g;
 
-timestep = 0.75;
-frames = 1000;
+timestep = 1;
+frames = 10000;
 
-planet1 = CelestialBody("Red",   'r', [0,0], [0,deg2rad(0)],  5, 60, 8E12, "static");
-planet2 = CelestialBody("Blue",  'b', [-150,0],  [2,deg2rad(90)], 5, 30, 8E10);
-planet3 = CelestialBody("Green", 'g', [-140,0], [2.75,deg2rad(90)], 5, 15, 5E1);
+planet1 = CelestialBody("Red",   'r', [-150,0], [1.2,deg2rad(90)],  5, 60, 9E12, "static");
+planet2 = CelestialBody("Blue",  'b', [150,0],  [0.8,deg2rad(90)], 5, 60, 9E12);
+planet3 = CelestialBody("Green", 'g', [0,0],    [1E-1,deg2rad(225)], 5, 60, 9E12, "static");
 
-x_limit = [-200,200];
-y_limit = [-200,200];
+x_limit = [-250,250];
+y_limit = [-250,250];
 uni = Universe([planet1,planet2,planet3],timestep,x_limit, y_limit);
 uni.bigBang(frames);
 
